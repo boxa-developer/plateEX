@@ -34,7 +34,7 @@ def inside_box(cx, cy, rect):
         return False
 
 
-img = cv2.imread('plates/p9.jpg')
+img = cv2.imread('plates/p_x.jpg')
 
 img = cv2.copyMakeBorder(img, 5, 5, 5, 5, cv2.BORDER_CONSTANT, value=(0, 0, 0))
 
