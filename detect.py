@@ -4,7 +4,7 @@ import cv2
 import os
 import matplotlib.pyplot as plt
 
-
+#Plate Digits Location
 def unsharp_mask(image, kernel_size=(5, 5), sigma=1.5, amount=2.0, threshold=0):
     blurred = cv2.GaussianBlur(image, kernel_size, sigma)
     sharpened = float(amount + 1) * image - float(amount) * blurred
