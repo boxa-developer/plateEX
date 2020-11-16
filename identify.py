@@ -4,8 +4,8 @@ import imutils
 from scipy.spatial import distance
 import pytesseract
 
-# Tesseract options, PSM=10 (single character),
-psm = 10
+# Tesseract options, PSM=6 (horizontal text),
+psm = 6
 # Alphanumerical
 tesseract_options = "-c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 --psm {}".format(psm)
 
@@ -40,7 +40,7 @@ def inside_box(cx, cy, rect):
         return False
 
 
-img = cv2.imread('plates/p_x.jpg')
+img = cv2.imread('plates/p11.jpg')
 
 img = cv2.copyMakeBorder(img, 5, 5, 5, 5, cv2.BORDER_CONSTANT, value=(0, 0, 0))
 
@@ -68,7 +68,7 @@ M = cv2.getPerspectiveTransform(cv2.boxPoints(rect), pts2)
 dst = cv2.warpPerspective(division, M, (200, 50))
 
 dst = cv2.copyMakeBorder(dst, 10,10, 10,10, cv2.BORDER_CONSTANT, value=(255, 255, 255))
-cv2.imshow('Corrected', dst)
+
 H, W = dst.shape[:2]
 _, th = cv2.threshold(dst, 100, 255, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 contours = cv2.findContours(th, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -76,8 +76,9 @@ contours = sort_contours(imutils.grab_contours(contours))[0]
 black_frame = np.zeros_like(dst)
 counter = 0
 rects = []
-extractions = []
 old_x = None
+
+mask = np.zeros(shape=dst.shape, dtype=np.uint8)
 for i, contour in enumerate(contours):
     (x, y, w, h) = cv2.boundingRect(contour)
     shape_filter = True if (10 < w < 100 and h > 20) else False
@@ -90,41 +91,30 @@ for i, contour in enumerate(contours):
             n = int(w / h / 0.6)
             for num in range(1, n + 1):
                 print(num)
-                extractions.append({
-                    'char': cv2.cvtColor(dst[y:y + h, x + w // n * (num - 1):x + w // n * num], cv2.COLOR_GRAY2BGR),
-                    'width': w // n * num,
-                    'height': h,
-                    'distance': 0,
-                    'kx': round((w // n * num) / h, 2),
-                    'id': counter
-                })
+                cv2.rectangle(mask, (x + w // n * (num - 1), y), (x + w // n * num, y + h), (255, 255, 255), -1)
                 counter += 1
         else:
             if counter == 1:
                 old_x = x + w
-                extractions.append({
-                    'char': cv2.cvtColor(dst[y:y + h, x:x + w], cv2.COLOR_GRAY2BGR),
-                    'width': w,
-                    'height': h,
-                    'distance': -1,
-                    'kx': round(w / h, 2),
-                    'id': counter
-                })
+                cv2.rectangle(mask, (x, y), (x + w, y + h), (255, 255, 255), -1)
             else:
                 old_x = x + w
-                extractions.append({
-                    'char': cv2.cvtColor(dst[y:y + h, x:x + w], cv2.COLOR_GRAY2BGR),
-                    'width': w,
-                    'height': h,
-                    'distance': dist(x, 0, old_x, 0),
-                    'kx': round(w / h, 2),
-                    'id': counter
-                })
+                cv2.rectangle(mask, (x, y), (x + w, y + h), (255, 255, 255), -1)
 
+fg_masked = cv2.bitwise_and(dst, mask)
+bg_masked = cv2.bitwise_and(np.full(dst.shape, 255, dtype=np.uint8), cv2.bitwise_not(mask))
+masked = cv2.bitwise_or(bg_masked, fg_masked)
 
-for i, item in enumerate(extractions):
-    ch = pytesseract.image_to_string(item["char"], config=tesseract_options)
-    print(ch)
-    cv2.imshow("%d_%s" % (item["id"], ch), item["char"])
-cv2.imshow('original', img)
-cv2.waitKey(0)
+cv2.imwrite("test/original.jpg", img)
+cv2.imwrite("test/corrected.jpg", dst)
+cv2.imwrite("test/masked.jpg", masked)
+
+number = pytesseract.image_to_string(masked, lang="eng", config=tesseract_options)
+print(number)
+
+# cv2.imshow('Original', img)
+# cv2.imshow('Corrected', dst)
+# cv2.imshow("Masked", masked)
+
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
