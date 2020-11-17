@@ -33,8 +33,6 @@ def crop(img):
         (x, y, w, h) = cv2.boundingRect(contour)
         # Character Filters
         shape_filter = True if (10 < w < 60 and 20 < h < 70) else False
-        area_filter = True if (120 < cv2.contourArea(contour) < 900) else False
-        density_filter = True if (w * h - cv2.countNonZero(thresh[y:y + h, x:x + w]) > 40) else False
 
         if shape_filter and w < 1.3 * h:
             X.append(centroid(x, y, w, h)[0])
@@ -61,12 +59,6 @@ def crop(img):
     M = cv2.getPerspectiveTransform(pts1, pts2)
     dst = cv2.warpPerspective(rt, M, (400, 50))
 
-    # # Cropping the plate
-    # new_dst = dst[0:dst.shape[0], 40:dst.shape[1] - 40]
-    # cv2.imshow("new_dst", new_dst)
-    # cv2.waitKey(0)
-
     dst = cv2.copyMakeBorder(dst, 10, 10, 0, 0, cv2.BORDER_CONSTANT, value=(255, 255, 255))
     _, thresh = cv2.threshold(dst, 110, 255, cv2.THRESH_BINARY)
     return thresh
-    # cv2.imshow('iw', thresh)
