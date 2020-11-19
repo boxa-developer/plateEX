@@ -7,9 +7,13 @@ import os
 scanObj = os.scandir('./plates')
 imageCount = 2000
 images = [cv2.imread(f'plates/{item.name}') for item in scanObj]
+
+
 # img = cv2.imread('plates/p1.jpg')
 
-for img in images:
+# for img in images:
+
+def crop_img(img):
     X, Y, H = [], [], []  # Declaring Char Lists
 
     img = cv2.resize(img, (400, 100))
@@ -51,12 +55,13 @@ for img in images:
     rt = rotate_image(division, (-1) * (angle + 1))
     thresh = cv2.threshold(rt, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
     horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 1))
+
     detected_lines = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, horizontal_kernel, iterations=2)
     cnts = cv2.findContours(detected_lines, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
     for c in cnts:
         cv2.drawContours(rt, [c], -1, (100, 100, 255), -1)
-    repair_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 6))
+    repair_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 3))
     result = 255 - cv2.morphologyEx(255 - rt, cv2.MORPH_CLOSE, repair_kernel, iterations=1)
 
     # Apply Perspective Transform
@@ -67,10 +72,10 @@ for img in images:
                        [400, mean + APPROX_HEIGHT]])
     pts2 = np.float32([[0, 60], [0, 0], [400, 0], [400, 60]])
     M = cv2.getPerspectiveTransform(pts1, pts2)
-    # cv2.line(rt, (0, int(mean)), (400, int(mean)), (0, 0, 0), 2)
+
     dst = cv2.warpPerspective(rt, M, (400, 60))
-    # _, thresh1 = cv2.adaptiveThreshold(result, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, -2)
-    _, thresh2 = cv2.threshold(result, 50, 255, cv2.THRESH_BINARY)
-    # cv2.imshow('Img1', thresh1)
-    cv2.imshow('Img2', thresh2)
-    cv2.waitKey(0)
+    _, thresh2 = cv2.threshold(result, 90, 255, cv2.THRESH_BINARY)
+    return thresh2
+    # cv2.imshow('Img2', thresh2)
+    # cv2.imshow('k', result)
+    # cv2.waitKey(0)
