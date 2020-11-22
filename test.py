@@ -12,14 +12,14 @@ sr.readModel(path)
 # Set the desired model and scale to get correct pre- and post-processing
 sr.setModel("espcn", 4)
 
-img = cv2.imread('Plates/102_592590.jpg')
+img = cv2.imread('Plates/103_668863.jpg')
 
 img = sr.upsample(img)
 cv2.imwrite("test/upsampled.jpg", img)
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-thresh = 120
+thresh = 100
 ret,thresh_img = cv2.threshold(gray, thresh, 255, cv2.THRESH_BINARY)
 thresh_img = cv2.copyMakeBorder(thresh_img, 5, 5, 5, 5, cv2.BORDER_CONSTANT, value=255)
 cv2.imwrite("test/thresh.jpg", thresh_img)
