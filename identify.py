@@ -44,7 +44,7 @@ def inside_box(cx, cy, rect):
 
 scanObj = os.scandir('plates')
 images = [cv2.imread(os.path.join('plates', item.name)) for item in scanObj]
-img = cv2.imread('plates/p10.jpg')
+img = cv2.imread('plates/p5.jpg')
 # for img in images:
 dst = crop_img(img)
 cv2.imshow('crop', dst)
