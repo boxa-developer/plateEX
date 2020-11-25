@@ -75,7 +75,9 @@ def crop_img(img):
 
     dst = cv2.warpPerspective(rt, M, (400, 60))
     _, thresh2 = cv2.threshold(result, 90, 255, cv2.THRESH_BINARY)
-    return thresh2
+    kernel = np.ones((3, 3), np.uint8)
+    result = cv2.erode(thresh2, kernel, iterations=1)
+    return result
     # cv2.imshow('Img2', thresh2)
     # cv2.imshow('k', result)
     # cv2.waitKey(0)
