@@ -4,6 +4,8 @@ plate_bg = [
     './plate_template/plate_original.png'
 ]
 
+plate_color = (50, 50, 50)
+
 
 class Plate(object):
     def __init__(self, bg_path, width, height):
@@ -40,7 +42,12 @@ plate = Plate(bg_path=plate_bg[0], width=500, height=300)
 drawable = plate.build_drawable_image()
 
 car_number = Number(font_path='./plate_template/CARGO2.TTF')
-car_number.build_characters(drawable, (10, 10), 40, '0', (0, 0, 0))
-car_number.build_characters(drawable, (40, 10), 40, '1', (0, 0, 0))
-
+car_number.build_characters(drawable, (15, 10), 40, '0', plate_color)
+car_number.build_characters(drawable, (40, 10), 40, '1', plate_color)
+car_number.build_characters(drawable, (80, 3), 50, 'A', plate_color)
+car_number.build_characters(drawable, (120, 3), 50, '5', plate_color)
+car_number.build_characters(drawable, (150, 3), 50, '5', plate_color)
+car_number.build_characters(drawable, (180, 3), 50, '5', plate_color)
+car_number.build_characters(drawable, (225, 3), 50, 'A', plate_color)
+car_number.build_characters(drawable, (260, 3), 50, 'B', plate_color)
 plate.img_show()
