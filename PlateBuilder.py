@@ -31,8 +31,7 @@ class Number(object):
         font = ImageFont.truetype(self.font_path, size)
         return font
 
-    def build_characters(self, draw, pos, scale, text, color):
-        size = scale * 60
+    def build_characters(self, draw, pos, size, text, color):
         font = self.build_font(size)
         draw.text(pos, text, font=font, fill=color)
 
@@ -40,3 +39,8 @@ class Number(object):
 plate = Plate(bg_path=plate_bg[0], width=500, height=300)
 drawable = plate.build_drawable_image()
 
+car_number = Number(font_path='./plate_template/CARGO2.TTF')
+car_number.build_characters(drawable, (10, 10), 40, '0', (0, 0, 0))
+car_number.build_characters(drawable, (40, 10), 40, '1', (0, 0, 0))
+
+plate.img_show()
