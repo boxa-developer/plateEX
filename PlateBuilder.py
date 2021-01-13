@@ -1,21 +1,27 @@
 from PIL import Image, ImageDraw, ImageFont
+import rstr
+from random import choice
+import re
 
 plate_bg = [
     './plate_template/plate_original.png'
 ]
 
-plate_types = [
-    [(15, 10), (40, 10), (80, 3), (125, 3), (155, 3), (185, 3), (225, 3), (260, 3)]
+plate_template = [
+    "^[0-9]{2}[0-9]{3}[A-Z]{3}",
+    "^[0-9]{2}[A-Z]{1}[0-9]{3}[A-Z]{2}"
 ]
 
-# (15, 10), 40, '0', plate_color)
-# car_number.build_characters(drawable, (40, 10), 40, '1', plate_color)
-# car_number.build_characters(drawable, (80, 3), 50, 'A', plate_color)
-# car_number.build_characters(drawable, (125, 3), 50, '5', plate_color)
-# car_number.build_characters(drawable, (155, 3), 50, '5', plate_color)
-# car_number.build_characters(drawable, (185, 3), 50, '5', plate_color)
-# car_number.build_characters(drawable, (225, 3), 50, 'A', plate_color)
-# car_number.build_characters(drawable, (260, 3), 50, 'B', plate_color)
+plate_types = [
+    [(15, 10), (40, 10),  # stands for 01
+     (80, 3),  # stands for A
+     (120, 3), (152, 3), (185, 3),  # stands for 123
+     (225, 3), (260, 3)],  # stands for CD
+
+    [(15, 10), (40, 10),  # stands for 01
+     (83, 3), (115, 3), (150, 3),  # stands for 123
+     (190, 3), (225, 3), (260, 3)]  # stands for AAA
+]
 plate_color = (50, 50, 50)
 
 
@@ -50,14 +56,26 @@ class Number(object):
         draw.text(pos, text, font=font, fill=color)
 
 
-num = '01A123CD'
+plate_str = rstr.xeger(choice(plate_template))
+num = plate_str
 plate = Plate(bg_path=plate_bg[0], width=500, height=300)
 drawable = plate.build_drawable_image()
 
 car_number = Number(font_path='./plate_template/CARGO2.TTF')
+p_type = plate_types[0]
+not_matched = False
+if re.search(plate_template[0], num):
+    p_type = plate_types[1]
+elif re.search(plate_template[1], num):
+    p_type = plate_types[0]
+else:
+    not_matched = True
 
-for i, char in enumerate(num):
-    h = 40 if i < 2 else 50
-    car_number.build_characters(drawable, plate_types[0][i], h, char, plate_color)
+if not not_matched:
+    for i, char in enumerate(num):
+        h = 40 if i < 2 else 50
+        car_number.build_characters(drawable, p_type[i], h, char, plate_color)
 
-plate.img_show()
+    plate.img_show()
+else:
+    print("Sorry! Not Match!")
