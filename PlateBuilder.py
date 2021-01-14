@@ -35,8 +35,16 @@ class Plate(object):
         resized = self.img.resize(size)
         return resized
 
+    def add_margin(self, top=20, right=20, bottom=20, left=20, color=(255, 255, 255)):
+        width, height = self.img.size
+        new_width = width + right + left
+        new_height = height + top + bottom
+        result = Image.new(self.img.mode, (new_width, new_height), color)
+        result.paste(self.img, (left, top))
+        return result
+
     def img_show(self):
-        self.img.show()
+        self.add_margin().show()
 
     def build_drawable_image(self):
         draw = ImageDraw.Draw(self.img)
@@ -75,7 +83,7 @@ if not not_matched:
     for i, char in enumerate(num):
         h = 40 if i < 2 else 50
         car_number.build_characters(drawable, p_type[i], h, char, plate_color)
-
+    plate.add_margin()
     plate.img_show()
 else:
     print("Sorry! Not Match!")
