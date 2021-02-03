@@ -90,7 +90,7 @@ class Extractor(object):
 if __name__ == '__main__':
     import os
 
-    path = "Plates"
+    path = "train_images/pk/train"
     scanObj = os.scandir(path)
     images = [cv2.imread(os.path.join(path, item.name)) for item in scanObj]
     ex_machine = Extractor()

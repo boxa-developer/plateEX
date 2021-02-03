@@ -95,8 +95,8 @@ def crop_img(img):
     pts2 = np.float32([[0, 60], [0, 0], [400, 0], [400, 60]])
     M = cv2.getPerspectiveTransform(pts1, pts2)
 
-    dst = cv2.warpPerspective(rt, M, (400, 60))
-    # cv2.imshow('dst', dst)
+    dst = cv2.warpPerspective(gray, M, (400, 60))
+    cv2.imshow('dst_', dst)
     _, thresh2 = cv2.threshold(dst, 120, 255, cv2.THRESH_BINARY)
     kernel = np.ones((3, 3), np.uint8)
     result = cv2.erode(thresh2, kernel, iterations=1)
